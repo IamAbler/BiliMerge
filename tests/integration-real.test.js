@@ -19,10 +19,16 @@ function argumentString(module) {
     .join("&");
 }
 
-function prefixedArgumentString(a, b) {
+function argumentStringWith(module, overrides = {}) {
+  return module.arguments
+    .map(({ key, rawDefault, default: value, quoted }) => `${key}=${overrides[key] ?? rawDefault ?? (quoted ? JSON.stringify(value) : value)}`)
+    .join("&");
+}
+
+function prefixedArgumentString(a, b, overridesA = {}, overridesB = {}) {
   return [
-    ...a.arguments.map(({ key, rawDefault, default: value, quoted }) => `ADBlock.${key}=${rawDefault ?? (quoted ? JSON.stringify(value) : value)}`),
-    ...b.arguments.map(({ key, rawDefault, default: value, quoted }) => `Global.${key}=${rawDefault ?? (quoted ? JSON.stringify(value) : value)}`),
+    ...a.arguments.map(({ key, rawDefault, default: value, quoted }) => `ADBlock.${key}=${overridesA[key] ?? rawDefault ?? (quoted ? JSON.stringify(value) : value)}`),
+    ...b.arguments.map(({ key, rawDefault, default: value, quoted }) => `Global.${key}=${overridesB[key] ?? rawDefault ?? (quoted ? JSON.stringify(value) : value)}`),
   ].join("&");
 }
 
@@ -68,6 +74,48 @@ test("real upstream fixtures preserve A-only and B-only output equivalence", asy
   const mergedB = await runSurgeScript(generateMergedScript({
     type: "request", sourceA: "", sourceB: bRequest, moduleA: a, moduleB: b, dispatch,
   }), { request: bOnlyRequest, argument: prefixedArgumentString(a, b) });
+  assert.equal(standaloneB.calls, 1);
+  assert.equal(mergedB.calls, 1);
+  assert.deepEqual(normalize(mergedB.payload), normalize(standaloneB.payload));
+});
+
+test("real upstream A request mock and B response preserve standalone behavior", async () => {
+  const { a, b, aRequest, bResponse } = await upstream();
+  const dispatch = buildDispatch(a.scripts, b.scripts);
+  const aOverrides = { "Privacy.BlockBiliCommercial": "true" };
+  const aRequestFixture = {
+    url: "https://cm.bilibili.com/cm/api/conversion/mobile/v2",
+    method: "POST",
+    headers: {},
+  };
+  const standaloneA = await runSurgeScript(aRequest, {
+    request: aRequestFixture, argument: argumentStringWith(a, aOverrides),
+  });
+  const mergedA = await runSurgeScript(generateMergedScript({
+    type: "request", sourceA: aRequest, sourceB: "", moduleA: a, moduleB: b, dispatch,
+  }), {
+    request: aRequestFixture, argument: prefixedArgumentString(a, b, aOverrides),
+  });
+  assert.equal(standaloneA.calls, 1);
+  assert.equal(mergedA.calls, 1);
+  assert.ok(standaloneA.payload.response, "A privacy fixture must return a local mock response");
+  assert.deepEqual(normalize(mergedA.payload), normalize(standaloneA.payload));
+
+  const bRequestFixture = {
+    url: "https://api.bilibili.com/pgc/view/v2/app/season?season_id=1",
+    headers: {},
+  };
+  const bResponseFixture = {
+    status: "HTTP/1.1 200 OK",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ code: 0, data: { modules: [], rights: {} } }),
+  };
+  const standaloneB = await runSurgeScript(bResponse, {
+    request: bRequestFixture, response: bResponseFixture, argument: argumentString(b),
+  });
+  const mergedB = await runSurgeScript(generateMergedScript({
+    type: "response", sourceA: "", sourceB: bResponse, moduleA: a, moduleB: b, dispatch,
+  }), { request: bRequestFixture, response: bResponseFixture, argument: prefixedArgumentString(a, b) });
   assert.equal(standaloneB.calls, 1);
   assert.equal(mergedB.calls, 1);
   assert.deepEqual(normalize(mergedB.payload), normalize(standaloneB.payload));
