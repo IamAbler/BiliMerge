@@ -6,13 +6,15 @@ Cloudflare Worker：动态拉取 Biliverse 的 ADBlock 与 Global latest 发布�
 
 ## 使用场景
 
-如果你在 Surge 中同时使用 Biliverse 的 **ADBlock**（去广告、隐私拦截）与 **Global**（地区线路、搜索及番剧解锁），原本需要安装两份模块。两者在少数 Bilibili 接口上会重叠，分别执行时不利于统一配置和排查。
+在 Surge 中，同一个请求端点通常只能执行一条匹配的脚本规则。Biliverse 的 **ADBlock**（去广告、隐私拦截）与 **Global**（地区线路、搜索及番剧解锁）会在部分 Bilibili 端点同时命中；直接同时安装两个原模块时，其中一条规则会覆盖或抢占另一条，造成另一个模块的部分功能失效。
 
-BiliMerge 适合希望：
+BiliMerge 将重叠规则收敛为一个入口脚本：该脚本在内部严格按 **ADBlock → Global** 顺序运行两个上游 bundle，并且只向 Surge 调用一次 `$done()`。因此同一端点上两模块应生效的功能可以同时保留，而不会发生 Surge 脚本规则冲突。
+
+它适合希望：
 
 - 只订阅一条 Surge 模块链接，同时保留两模块的功能与 BoxJS 配置；
 - 分别调整 `ADBlock.*` 与 `Global.*` 参数，例如独立设置两套 `LogLevel`；
-- 让重叠接口严格按 **ADBlock → Global** 的顺序处理，并让 Surge 仅运行一次脚本、收到一次 `$done()`；
+- 消除重叠端点的脚本抢占，让两块逻辑按确定顺序共同生效；
 - 不想手动追踪 Biliverse 上游版本。Worker 会在缓存期后自动拉取 latest 发布物重新构建。
 
 它只在获取模块/脚本时构建内容，**不会作为 Bilibili 请求代理**。上游暂时不可用时，脚本会 fail-open，避免阻断原始请求或响应。
