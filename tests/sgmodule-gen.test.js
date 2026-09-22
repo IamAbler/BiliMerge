@@ -35,7 +35,9 @@ test("generates a complete overlap-safe merged module", async () => {
     ({ type, pattern }) => type === "http-response" && new RegExp(pattern).test(overlapUrl),
   );
   assert.equal(matchingResponseRows.length, 1, "overlap URL must invoke merged script once");
-  assert.match(matchingResponseRows[0].name, /\(A\+B\)$/);
+  assert.match(matchingResponseRows[0].name, /^📺 BiliBili\.ADBlock\.view\.response\.grpc \(ADBlock \+ Global\)$/);
+  assert.ok(parsed.scripts.some(({ name }) => name === "📺 BiliBili.Global.ep.list.json"));
+  assert.ok(parsed.scripts.some(({ name }) => name === "📺 BiliBili.ADBlock.response.json [2]"));
   assert.match(parsed.argumentsDesc, /ADBlock\.Feed\.AD:/);
   assert.match(parsed.argumentsDesc, /Global\.Proxies\.CHN:/);
   assert.match(parsed.argumentsDesc, /\$argument/);

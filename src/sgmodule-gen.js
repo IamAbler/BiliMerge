@@ -103,9 +103,16 @@ export function generateSgmodule({ adblock, global: globalModule, host }) {
   appendSection("Map Local", [...adblock.mapLocal, ...globalModule.mapLocal]);
   appendSection("Body Rewrite", [...adblock.bodyRewrite, ...globalModule.bodyRewrite]);
 
-  const scriptLines = entries.map((entry, index) => {
+  const usedNames = new Map();
+  const scriptLines = entries.map((entry) => {
     const kind = entry.type === "http-response" ? "response" : "request";
-    const suffix = entry.sources.length > 1 ? " (A+B)" : "";
+    const sourceSuffix = entry.sources.length > 1 ? " (ADBlock + Global)" : "";
+    const originalName = `${entry.name}${sourceSuffix}`;
+    const occurrence = (usedNames.get(originalName) ?? 0) + 1;
+    usedNames.set(originalName, occurrence);
+    // Upstream has a few duplicate display names. Keep the first exact name and
+    // suffix later duplicates so Surge can still distinguish each generated rule.
+    const name = occurrence === 1 ? originalName : `${originalName} [${occurrence}]`;
     const fields = [
       `type=${entry.type}`,
       `pattern=${entry.pattern}`,
@@ -113,7 +120,7 @@ export function generateSgmodule({ adblock, global: globalModule, host }) {
       `script-path=https://${safeHost}/merged-${kind}.js`,
       `argument=${scriptArgument}`,
     ];
-    return `📺 BiliMerge.${kind}.${String(index + 1).padStart(2, "0")}${suffix} = ${fields.join(", ")}`;
+    return `${name} = ${fields.join(", ")}`;
   });
   appendSection("Script", scriptLines);
 
