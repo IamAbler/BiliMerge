@@ -2,7 +2,7 @@
 
 Cloudflare Worker：动态拉取 Biliverse 的 ADBlock 与 Global latest 发布物，在 Worker 内构建为一个 Surge 模块。它不代理任何 Bilibili 流量。
 
-> **先卸载原始 ADBlock 和 Global 模块，再安装合并模块。** 与原模块共存会造成重复处理。
+> **启用合并模块前，请先关闭原始 ADBlock 和 Global 模块。** 同时启用会造成重复处理。
 
 ## 使用场景
 

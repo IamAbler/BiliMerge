@@ -7,18 +7,18 @@
   <style>
     :root { color-scheme: dark; font-family: system-ui, sans-serif; }
     body { max-width: 760px; margin: 48px auto; padding: 0 20px; background:#10131a; color:#e7edf7; line-height:1.65; }
-    a { color:#8cc8ff; } code { background:#202838; padding:2px 5px; border-radius:4px; } .warning { border-left:4px solid #f4b844; padding:12px 16px; background:#262116; } .install { display:inline-block; margin:4px 8px 4px 0; padding:10px 14px; border-radius:7px; color:#07121f; background:#8cc8ff; font-weight:700; text-decoration:none; } .install.secondary { color:#cfe8ff; background:#202838; font-weight:500; }
+    a { color:#8cc8ff; } code { background:#202838; padding:2px 5px; border-radius:4px; } .warning { border-left:4px solid #f4b844; padding:12px 16px; background:#262116; } .install { display:inline-block; margin:4px 8px 4px 0; padding:10px 14px; border:0; border-radius:7px; color:#07121f; background:#8cc8ff; font:inherit; font-weight:700; text-decoration:none; cursor:pointer; } .install.secondary { color:#cfe8ff; background:#202838; font-weight:500; }
   </style>
 </head>
 <body>
   <h1>BiliMerge</h1>
   <p>此 Worker 在每次请求时拉取 Biliverse <strong>ADBlock</strong> 与 <strong>Global</strong> 的 latest 发布物，构建成一个 Surge 模块与两份合并脚本。</p>
   <p>
-    <a id="surge-install" class="install" href="/bilimerge.sgmodule">在 Surge 中一键添加</a>
-    <a class="install secondary" href="/bilimerge.sgmodule">打开模块文件</a>
+    <a id="surge-install" class="install" href="/bilimerge.sgmodule">在 Surge 中一键导入</a>
+    <button id="copy-module-url" class="install secondary" type="button">复制模块安装链接</button>
   </p>
-  <p><small>一键添加按钮会调用 Surge URL Scheme；若当前设备未安装 Surge，请使用模块文件链接复制或下载地址。</small></p>
-  <div class="warning"><strong>安装前务必卸载原始 ADBlock 和 Global 模块。</strong>同时安装会导致同一 URL 被重复处理。</div>
+  <p><small>一键导入会调用 Surge URL Scheme；也可复制链接后在 Surge 中手动添加模块。</small></p>
+  <div class="warning"><strong>启用合并模块前务必关闭原始 ADBlock 和 Global 模块。</strong>同时启用会导致同一 URL 被重复处理。</div>
   <h2>工作方式</h2>
   <ul>
     <li>仅在 Worker 构建期合并；不代理 Bilibili 请求。</li>
@@ -35,6 +35,16 @@
   <script>
     const moduleUrl = new URL("/bilimerge.sgmodule", window.location.origin).href;
     document.querySelector("#surge-install").href = `surge:///install-module?url=${encodeURIComponent(moduleUrl)}`;
+    document.querySelector("#copy-module-url").addEventListener("click", async (event) => {
+      const button = event.currentTarget;
+      try {
+        await navigator.clipboard.writeText(moduleUrl);
+        button.textContent = "已复制模块链接";
+      } catch {
+        window.prompt("复制模块安装链接：", moduleUrl);
+      }
+      window.setTimeout(() => { button.textContent = "复制模块安装链接"; }, 1800);
+    });
   </script>
 </body>
 </html>
