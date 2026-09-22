@@ -194,7 +194,9 @@ export default {
     };
     if (url.pathname === "/merged-request.js") return serveMergedScript("request", options);
     if (url.pathname === "/merged-response.js") return serveMergedScript("response", options);
-    if (url.pathname === "/bili-adblock.sgmodule") return serveSgmodule(request, options);
+    if (url.pathname === "/bilimerge.sgmodule" || url.pathname === "/bili-adblock.sgmodule") {
+      return serveSgmodule(request, options);
+    }
     if (env?.ASSETS) return env.ASSETS.fetch(request);
     return new Response("BiliMerge\n", { status: url.pathname === "/" ? 200 : 404 });
   },

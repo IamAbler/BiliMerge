@@ -8,6 +8,7 @@
     "run_worker_first": [
       "/merged-request.js",
       "/merged-response.js",
+      "/bilimerge.sgmodule",
       "/bili-adblock.sgmodule"
     ]
   }

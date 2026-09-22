@@ -37,9 +37,11 @@ test("serves dynamic merged scripts and modules", async () => {
   const scriptText = await scriptResponse.text();
   assert.doesNotThrow(() => new vm.Script(scriptText));
 
-  const moduleResponse = await worker.fetch(new Request("https://bilimerge.test/bili-adblock.sgmodule"), env);
+  const moduleResponse = await worker.fetch(new Request("https://bilimerge.test/bilimerge.sgmodule"), env);
   assert.equal(moduleResponse.status, 200);
   const parsed = parseSgmodule(await moduleResponse.text());
+  const legacyModuleResponse = await worker.fetch(new Request("https://bilimerge.test/bili-adblock.sgmodule"), env);
+  assert.equal(legacyModuleResponse.status, 200);
   assert.equal(parsed.scripts.length, 33);
   assert.ok(parsed.scripts.every(({ scriptPath }) => scriptPath.startsWith("https://bilimerge.test/")));
 });

@@ -24,7 +24,7 @@ BiliMerge 将重叠规则收敛为一个入口脚本：该脚本在内部严格�
 部署后在 Surge 添加：
 
 ```text
-https://bilimerge.<你的-workers.dev-子域>.workers.dev/bili-adblock.sgmodule
+https://bilimerge.<你的-workers.dev-子域>.workers.dev/bilimerge.sgmodule
 ```
 
 模块会指向同源的 `/merged-request.js`、`/merged-response.js`。它将 ADBlock 配置改为 `ADBlock.*` 前缀、Global 配置改为 `Global.*` 前缀，因此两套 `LogLevel` 可独立设置，BoxJS Map Local 条目仍被保留。
@@ -63,7 +63,20 @@ npm run dev
 
 ## 部署
 
-提供以下环境变量后执行：
+### Cloudflare Dashboard 直接绑定 GitHub（推荐）
+
+无需 GitHub Actions 或在仓库保存 Cloudflare Token：
+
+1. 打开 Cloudflare Dashboard → **Workers & Pages** → `bilimerge` → **Settings** → **Builds**。
+2. 连接 GitHub，授权 Cloudflare 访问仓库后选择 `IamAbler/BiliMerge`。
+3. 生产分支选择 `main`；根目录保持 `/`。
+4. 构建命令填写 `npm ci && npm test`，保存并触发首次构建。
+
+之后每次推送到 `main`，Workers Builds 会从仓库读取 `wrangler.jsonc` 并自动构建、部署 Worker。可在该 Worker 的 **Builds** 页面查看构建日志及回滚版本。
+
+### Wrangler CLI（可选）
+
+本地部署时，先通过 `npx wrangler login` 授权，或提供 API Token：
 
 ```bash
 export CLOUDFLARE_API_TOKEN=...
@@ -71,7 +84,7 @@ export CLOUDFLARE_ACCOUNT_ID=... # 可选；Wrangler 可在有权限时自行发
 npm run deploy
 ```
 
-部署后验证 `/`、`/bili-adblock.sgmodule`、`/merged-request.js`、`/merged-response.js`。上游更新会在缓存期后自动跟随，无需重新部署。
+部署后验证 `/`、`/bilimerge.sgmodule`、`/merged-request.js`、`/merged-response.js`。旧的 `/bili-adblock.sgmodule` 暂保留为兼容入口。上游更新会在缓存期后自动跟随，无需重新部署。
 
 ## 已知差异
 
