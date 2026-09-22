@@ -7,13 +7,17 @@
   <style>
     :root { color-scheme: dark; font-family: system-ui, sans-serif; }
     body { max-width: 760px; margin: 48px auto; padding: 0 20px; background:#10131a; color:#e7edf7; line-height:1.65; }
-    a { color:#8cc8ff; } code { background:#202838; padding:2px 5px; border-radius:4px; } .warning { border-left:4px solid #f4b844; padding:12px 16px; background:#262116; }
+    a { color:#8cc8ff; } code { background:#202838; padding:2px 5px; border-radius:4px; } .warning { border-left:4px solid #f4b844; padding:12px 16px; background:#262116; } .install { display:inline-block; margin:4px 8px 4px 0; padding:10px 14px; border-radius:7px; color:#07121f; background:#8cc8ff; font-weight:700; text-decoration:none; } .install.secondary { color:#cfe8ff; background:#202838; font-weight:500; }
   </style>
 </head>
 <body>
   <h1>BiliMerge</h1>
   <p>此 Worker 在每次请求时拉取 Biliverse <strong>ADBlock</strong> 与 <strong>Global</strong> 的 latest 发布物，构建成一个 Surge 模块与两份合并脚本。</p>
-  <p><a href="/bilimerge.sgmodule">安装合并模块：bilimerge.sgmodule</a></p>
+  <p>
+    <a id="surge-install" class="install" href="/bilimerge.sgmodule">在 Surge 中一键添加</a>
+    <a class="install secondary" href="/bilimerge.sgmodule">打开模块文件</a>
+  </p>
+  <p><small>一键添加按钮会调用 Surge URL Scheme；若当前设备未安装 Surge，请使用模块文件链接复制或下载地址。</small></p>
   <div class="warning"><strong>安装前务必卸载原始 ADBlock 和 Global 模块。</strong>同时安装会导致同一 URL 被重复处理。</div>
   <h2>工作方式</h2>
   <ul>
@@ -28,5 +32,9 @@
     <li><a href="/merged-response.js">merged-response.js</a></li>
   </ul>
   <p>上游版本随 latest 自动更新；不需要手工改版本号。</p>
+  <script>
+    const moduleUrl = new URL("/bilimerge.sgmodule", window.location.origin).href;
+    document.querySelector("#surge-install").href = `surge:///install-module?url=${encodeURIComponent(moduleUrl)}`;
+  </script>
 </body>
 </html>
