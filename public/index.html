@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>BiliMerge</title>
+  <style>
+    :root { color-scheme: dark; font-family: system-ui, sans-serif; }
+    body { max-width: 760px; margin: 48px auto; padding: 0 20px; background:#10131a; color:#e7edf7; line-height:1.65; }
+    a { color:#8cc8ff; } code { background:#202838; padding:2px 5px; border-radius:4px; } .warning { border-left:4px solid #f4b844; padding:12px 16px; background:#262116; }
+  </style>
+</head>
+<body>
+  <h1>BiliMerge</h1>
+  <p>此 Worker 在每次请求时拉取 Biliverse <strong>ADBlock</strong> 与 <strong>Global</strong> 的 latest 发布物，构建成一个 Surge 模块与两份合并脚本。</p>
+  <p><a href="/bili-adblock.sgmodule">安装合并模块：bili-adblock.sgmodule</a></p>
+  <div class="warning"><strong>安装前务必卸载原始 ADBlock 和 Global 模块。</strong>同时安装会导致同一 URL 被重复处理。</div>
+  <h2>工作方式</h2>
+  <ul>
+    <li>仅在 Worker 构建期合并；不代理 Bilibili 请求。</li>
+    <li>模块按 URL 分诊：仅命中一块时只执行该块；重叠时按 ADBlock → Global 串联。</li>
+    <li>Surge 对每个请求只执行一次合并脚本，且只收到一次 <code>$done()</code>。</li>
+    <li>上游暂不可用时，脚本端 fail-open：原请求/响应不被拦截。模块更新端则返回错误，保留旧模块配置。</li>
+  </ul>
+  <h2>调试路径</h2>
+  <ul>
+    <li><a href="/merged-request.js">merged-request.js</a></li>
+    <li><a href="/merged-response.js">merged-response.js</a></li>
+  </ul>
+  <p>上游版本随 latest 自动更新；不需要手工改版本号。</p>
+</body>
+</html>

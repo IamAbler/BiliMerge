@@ -1,0 +1,16 @@
+{
+  "name": "bilimerge",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Build-time merger for Biliverse ADBlock and Global Surge modules",
+  "scripts": {
+    "test": "node --test",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "check": "node --check src/worker.js && npm test"
+  },
+  "devDependencies": {
+    "wrangler": "^4.44.0"
+  }
+}
