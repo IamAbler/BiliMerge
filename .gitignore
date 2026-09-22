@@ -1,4 +1,5 @@
 node_modules/
+todo.md
 .npm-cache/
 .config/
 .scratch/
