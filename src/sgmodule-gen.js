@@ -83,7 +83,7 @@ export function generateSgmodule({ adblock, global: globalModule, host }) {
     .join("\\n\\n");
 
   const lines = [
-    "#!name = 📺 BiliBili: Merged (ADBlock + Global)",
+    `#!name = Biliverse ADBlock ${adblock.version} & Global ${globalModule.version} 2in1`,
     `#!desc = 构建期合并 Biliverse ADBlock ${adblock.version} 与 Global ${globalModule.version}；运行时只执行一个脚本`,
     `#!author = ${stableUnion(adblock.author ? [adblock.author] : [], globalModule.author ? [globalModule.author] : []).join(",") || "Biliverse, BiliMerge"}`,
     `#!homepage = ${adblock.homepage || globalModule.homepage || "https://github.com/Biliverse"}`,
