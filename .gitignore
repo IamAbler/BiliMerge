@@ -7,3 +7,4 @@ todo.md
 .wrangler/
 coverage/
 .DS_Store
+/AGENTS.md
