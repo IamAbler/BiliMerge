@@ -188,6 +188,7 @@ export function parseSgmodule(text) {
     version: metadata.version.trim().replace(/^v/i, ""),
     name: metadata.name.trim(),
     description: metadata.desc ?? "",
+    date: (metadata.date ?? "").trim(),
     author: metadata.author ?? "",
     homepage: metadata.homepage ?? "",
     arguments: parseArguments(metadata.arguments),

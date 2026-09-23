@@ -17,6 +17,8 @@ test("generates a complete overlap-safe merged module", async () => {
   const text = generateSgmodule({ ...source, host: "bilimerge.example.workers.dev" });
   const parsed = parseSgmodule(text);
   assert.equal(parsed.version, "0.6.27+0.8.25");
+  assert.equal(parsed.date, "2026-09-17 14:37:43");
+  assert.equal(text, generateSgmodule({ ...source, host: "bilimerge.example.workers.dev" }), "module metadata must be stable across refresh checks");
   assert.equal(parsed.arguments.length, 39);
   assert.equal(parsed.arguments[0].key, "ADBlock.Splash");
   assert.equal(parsed.arguments[31].key, "Global.ForceHost");

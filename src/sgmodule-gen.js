@@ -52,6 +52,15 @@ function formatFlags(flags) {
   return keys.map((key) => (flags[key] === true ? key : `${key}=${flags[key]}`));
 }
 
+function stableModuleDate(adblock, globalModule) {
+  const dates = [adblock.date, globalModule.date]
+    .filter((value) => typeof value === "string" && value.trim())
+    .sort();
+  // Upstream #!date changes on release, unlike wall-clock generation time.
+  // Keep the merged module metadata byte-stable between refresh checks.
+  return dates.at(-1) || "1970-01-01 00:00:00";
+}
+
 function validateHost(host) {
   if (typeof host !== "string" || !host.trim() || /[/?#]/.test(host)) {
     throw new Error(`Invalid module host: ${host}`);
@@ -88,7 +97,7 @@ export function generateSgmodule({ adblock, global: globalModule, host }) {
     `#!author = ${stableUnion(adblock.author ? [adblock.author] : [], globalModule.author ? [globalModule.author] : []).join(",") || "Biliverse, BiliMerge"}`,
     `#!homepage = ${adblock.homepage || globalModule.homepage || "https://github.com/Biliverse"}`,
     "#!category = 🪐 Biliverse",
-    `#!date = ${new Date().toISOString().replace("T", " ").slice(0, 19)}`,
+    `#!date = ${stableModuleDate(adblock, globalModule)}`,
     `#!version = ${adblock.version}+${globalModule.version}`,
     `#!arguments = ${argumentDefinitions.join(",")}`,
     `#!arguments-desc = ${argumentsDesc}`,
